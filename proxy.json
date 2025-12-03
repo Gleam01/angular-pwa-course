@@ -1,6 +1,10 @@
 {
   "/api": {
-    "target": "http://localhost:9000",
-    "secure": false
+    "target": "http://localhost:9001",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "xfwd": true,
+    "proxyTimeout": 60000
   }
 }

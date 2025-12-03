@@ -17,12 +17,14 @@ app.route('/api/lessons')
     .get(readAllLessons);
 
 
-// launch an HTTP Server
-const httpServer:any = app.listen(9000, () => {
-    console.log("HTTP Server running at http://localhost:" + httpServer.address().port);
+// launch an HTTP Server bound to IPv4 localhost to avoid port conflicts
+const httpServer:any = app.listen(9001, '127.0.0.1', () => {
+    const addr = httpServer.address();
+    const port = addr && addr.port ? addr.port : 9001;
+    console.log("HTTP Server running at http://127.0.0.1:" + port);
 });
 
-
+httpServer.timeout = 60000;
 
 
 
