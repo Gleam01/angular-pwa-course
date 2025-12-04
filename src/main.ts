@@ -11,16 +11,13 @@ if (environment.production) {
 platformBrowserDynamic().bootstrapModule(AppModule)
     .then(() => {
 
-        if ('serviceWorker' in navigator) {
-
-            navigator.serviceWorker.register('/sw.js', {
-                scope: '/'
-            })
+        // Register the service worker when explicitly enabled via environment flag
+        if (environment.enableServiceWorker && 'serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js', { scope: '/' })
                 .then(registration => {
-
                     console.log('Service worker registration completed');
-
-                });
+                })
+                .catch(err => console.warn('Service worker registration failed:', err));
         }
 
     });
