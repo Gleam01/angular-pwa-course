@@ -1,4 +1,4 @@
-const VERSION = "v10";
+const VERSION = "v11";
 
 log("Installing Service Worker");
 
@@ -28,9 +28,20 @@ function getCacheName() {
   return `app-cache-${VERSION}`;
 }
 
-self.addEventListener("activate", () => {
-  log("Service Worker activated");
-});
+self.addEventListener("fetch", event => event.respondWith(cacheThenNetwork(event)));
+
+async function cacheThenNetwork(event) {
+  const cache = await caches.open(getCacheName());
+  const cachedResponse = await cache.match(event.request);
+  if (cachedResponse) {
+    log("Serving from cache:", event.request.url);
+    return cachedResponse;
+  }
+
+  const networkResponse = await fetch(event.request);
+  log("Serving from network:", event.request.url);
+  return networkResponse;
+}
 
 function log(message, ...data) {
   if (data.length > 0) {
