@@ -16,6 +16,10 @@ platformBrowserDynamic().bootstrapModule(AppModule)
             navigator.serviceWorker.register('/sw.js', { scope: '/' })
                 .then(registration => {
                     console.log('Service worker registration completed');
+                    setInterval(() => {
+                      console.log('Checking for service worker updates');
+                      registration.update();
+                    }, 60000);
                 })
                 .catch(err => console.warn('Service worker registration failed:', err));
         }

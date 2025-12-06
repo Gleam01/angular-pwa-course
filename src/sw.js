@@ -1,4 +1,4 @@
-const VERSION = "v11";
+const VERSION = "v13";
 
 log("Installing Service Worker");
 
@@ -9,6 +9,7 @@ self.addEventListener("install", (event) =>
 async function installServiceWorker() {
   log("Service Worker installation started ");
   const cache = await caches.open(getCacheName());
+  clients.claim();
   return cache.addAll([
     "/",
     "/runtime.js",
@@ -28,7 +29,9 @@ function getCacheName() {
   return `app-cache-${VERSION}`;
 }
 
-self.addEventListener("fetch", event => event.respondWith(cacheThenNetwork(event)));
+self.addEventListener("fetch", (event) =>
+  event.respondWith(cacheThenNetwork(event))
+);
 
 async function cacheThenNetwork(event) {
   const cache = await caches.open(getCacheName());
@@ -41,6 +44,23 @@ async function cacheThenNetwork(event) {
   const networkResponse = await fetch(event.request);
   log("Serving from network:", event.request.url);
   return networkResponse;
+}
+
+self.addEventListener("activate", () => activateSW());
+
+async function activateSW() {
+  log("Service Worker activated");
+
+  clients.skipWaiting();
+
+  const cacheKeys = await caches.keys();
+
+  cacheKeys.forEach((key) => {
+    if (key !== getCacheName()) {
+      log("Deleting old cache:", key);
+      caches.delete(key);
+    }
+  });
 }
 
 function log(message, ...data) {
